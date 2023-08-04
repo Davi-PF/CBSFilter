@@ -20,6 +20,35 @@ function Search-CBSLog {
     }
 }
 
+function UpdateKeywords {
+    $selectedKeywords = @()
+
+    if ($checkBoxErrorWarning.Checked) {
+        $selectedKeywords += "Error", "Warning"
+    } else {
+        if ($checkBoxError.Checked) {
+            $selectedKeywords += "Error"
+        }
+        if ($checkBoxWarning.Checked) {
+            $selectedKeywords += "Warning"
+        }
+    }
+
+    if ($checkBoxRollback.Checked) {
+        $selectedKeywords += "Rollback"
+    }
+
+    if ($checkBoxCritical.Checked) {
+        $selectedKeywords += "Critical"
+    }
+
+    if ($checkBoxMissing.Checked) {
+        $selectedKeywords += "Missing"
+    }
+
+    $txtKeywords.Text = $selectedKeywords -join "`r`n"
+}
+
 # Criar a janela
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Filtrar Arquivo CBS"
@@ -67,6 +96,60 @@ $txtKeywords = New-Object System.Windows.Forms.TextBox -Property @{
     Multiline = $true
 }
 
+# checkboxes
+
+$checkBoxWarning = New-Object System.Windows.Forms.CheckBox -Property @{
+    Text = "Warning"
+    Location = New-Object System.Drawing.Point(220, 90)
+    Size = New-Object System.Drawing.Size(120, 35)
+}
+
+$checkBoxError = New-Object System.Windows.Forms.CheckBox -Property @{
+    Text = "Error"
+    Location = New-Object System.Drawing.Point(355, 90)
+    Size = New-Object System.Drawing.Size(120, 35)
+}
+
+
+$checkBoxRollback = New-Object System.Windows.Forms.CheckBox -Property @{
+    Text = "Rollback"
+    Location = New-Object System.Drawing.Point(220, 135)
+    Size = New-Object System.Drawing.Size(120, 35)
+}
+
+$checkBoxCritical = New-Object System.Windows.Forms.CheckBox -Property @{
+    Text = "Critical"
+    Location = New-Object System.Drawing.Point(550, 135)
+    Size = New-Object System.Drawing.Size(120, 35)
+}
+
+$checkBoxMissing = New-Object System.Windows.Forms.CheckBox -Property @{
+    Text = "Missing"
+    Location = New-Object System.Drawing.Point(450, 135)
+    Size = New-Object System.Drawing.Size(120, 35)
+}
+
+$checkBoxAllKeywords = New-Object System.Windows.Forms.CheckBox -Property @{
+    Text = "Filtro Completo"
+    Location = New-Object System.Drawing.Point(355, 135)
+    Size = New-Object System.Drawing.Size(120, 35)
+}
+
+
+$checkBoxErrorWarning.Add_CheckStateChanged({ UpdateKeywords })
+$checkBoxError.Add_CheckStateChanged({ UpdateKeywords })
+$checkBoxWarning.Add_CheckStateChanged({ UpdateKeywords })
+$checkBoxRollback.Add_CheckStateChanged({ UpdateKeywords })
+$checkBoxCritical.Add_CheckStateChanged({ UpdateKeywords })
+$checkBoxMissing.Add_CheckStateChanged({ UpdateKeywords })
+
+
+#Fim checkboxes
+
+#Inicio botões
+
+
+# Criar o botão "Filtrar"
 $btnFilter = New-Object System.Windows.Forms.Button -Property @{
     Text = "Filtrar"
     Location = New-Object System.Drawing.Point(10, 180)
@@ -76,6 +159,8 @@ $btnFilter.Add_Click({
     Search-CBSLog -CbsLogPath $txtCbsLogPath.Text -Keywords $txtKeywords.Lines
 })
 
+
+# Criar o botão "Limpar Keywords"
 $btnClearKeywords = New-Object System.Windows.Forms.Button -Property @{
     Text = "Limpar Keywords"
     Location = New-Object System.Drawing.Point(75, 180)
@@ -83,40 +168,20 @@ $btnClearKeywords = New-Object System.Windows.Forms.Button -Property @{
 }
 $btnClearKeywords.Add_Click({
     $txtKeywords.Clear()
-})
-
-$btnErrorWarning = New-Object System.Windows.Forms.Button -Property @{
-    Text = "Filtro: Error, Warning"
-    Location = New-Object System.Drawing.Point(220, 90)
-    Size = New-Object System.Drawing.Size(120, 35)
-}
-$btnErrorWarning.Add_Click({
-    $txtKeywords.Text = "Error`r`nWarning"
-})
-
-$btnRollback = New-Object System.Windows.Forms.Button -Property @{
-    Text = "Filtro: Rollback"
-    Location = New-Object System.Drawing.Point(220, 135)
-    Size = New-Object System.Drawing.Size(120, 35)
-}
-$btnRollback.Add_Click({
-    $txtKeywords.Text = "Rollback"
-})
-
-$btnAllKeywords = New-Object System.Windows.Forms.Button -Property @{
-    Text = "Filtro Completo"
-    Location = New-Object System.Drawing.Point(355, 90)
-    Size = New-Object System.Drawing.Size(120, 35)
-}
-$btnAllKeywords.Add_Click({
-    $txtKeywords.Text = "Error`r`nWarning`r`nCritical`r`nRollback"
+    $checkBoxWarning.Checked = $false
+    $checkBoxError.Checked = $false
+    $checkBoxRollback.Checked = $false
+    $checkBoxCritical.Checked = $false
+    $checkBoxMissing.Checked = $false
+    $checkBoxAllKeywords.Checked = $false
 })
 
 # Adicionar os controles à janela
 $form.Controls.AddRange(@(
     $labelCbsLogPath, $txtCbsLogPath, $btnBrowse,
     $labelKeywords, $txtKeywords,
-    $btnFilter, $btnErrorWarning, $btnRollback, $btnAllKeywords, $btnClearKeywords
+    $btnFilter, $btnClearKeywords, 
+    $checkBoxWarning, $checkBoxError, $checkBoxRollback, $checkBoxCritical, $checkBoxMissing, $checkBoxAllKeywords
 ))
 
 # Exibir a janela
