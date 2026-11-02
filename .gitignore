@@ -1,0 +1,15 @@
+# Windows e logs gerados
+*.log
+*.tmp
+filtered_*.txt
+test_sample*
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.suo
+*.user
+
+# PowerShell
+*.ps1xml
+PSScriptAnalyzer.log
